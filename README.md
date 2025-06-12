@@ -10,8 +10,8 @@ WebELAN is unrelated to & independent from their efforts.
 # Used in...
 Used in other projects:
 
-- Transcripter
-- Excerpter
+- [Transcripter](https://github.com/drdrphd/transcripter)
+- [Excerpter](https://github.com/drdrphd/excerpter)
 
 # Development To-do List
 The initial intent was to interface with a real-time database platform (like Firebase) to create a multi-user editor for ELAN files (XML-based time-aligned tiered transcript files).
