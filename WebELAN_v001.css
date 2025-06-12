@@ -1,0 +1,156 @@
+* {
+	border: 1px solid green;
+}
+html, body {
+	height: 100%;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+}
+body {
+	font-family: sans-serif;
+	box-sizing: border-box;
+}
+div {
+	padding: 2em;
+}
+input, button {
+	font-size: 1em;
+	margin-right: 0.25em;
+}
+label {
+	display: inline-flex;
+	margin-right: 1em;
+}
+
+#user-input {
+	display: flex;
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	width: 100%;
+	text-align: center;
+	justify-content: center;
+	outline: .5em dashed #d0d0d0;
+	outline-offset: -1em;
+	overflow: hidden;
+	align-items: center;
+}
+#user-input > div {
+	cursor: pointer;
+}
+
+#elan {
+	display: none;
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	width: 100%;
+	overflow: hidden;
+}
+#audio-block {
+	display: flex;
+	margin: 0;
+	padding: 0;
+	height: 40%;
+	width: 100%;
+	overflow: hidden;
+}
+#audio-input {
+	display: flex;
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	width: 100%;
+	text-align: center;
+	justify-content: center;
+	outline: .5em dashed #d0d0d0;
+	outline-offset: -1em;
+	overflow: hidden;
+	align-items: center;
+}
+#audio-input > div {
+	cursor: pointer;
+}
+#load-audio-container {
+	display: none;
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	width: 100%;
+	text-align: center;
+	justify-content: center;
+	align-items: center;
+}
+#load-audio-filename {
+	display: flex;
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	width: 100%;
+	text-align: center;
+	justify-content: center;
+	align-items: center;
+	font-size: 2em;
+}
+#load-audio-button {
+	display: flex;
+	margin: 0 15%;
+	padding: 0;
+	height: 25%;
+	width: 25%;
+	text-align: center;
+	justify-content: center;
+	align-items: center;
+	font-size: 2em;
+	color: white;
+	background-color: skyblue;
+	border-radius: 0.5em;
+	border: 3px solid #2b95c0;
+}
+#audio-display {
+	display: none;
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	width: 100%;
+	overflow: hidden;
+}
+#spectrogram {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 60%;
+}
+#waveform {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 40%;
+}
+#tier-block {
+	display: block;
+	margin: 0;
+	padding: 0;
+	height: 60%;
+	width: 100%;
+	overflow: scroll;
+}
+
+
+table {
+	border-collapse: collapse;
+}
+table, tr, td {
+	border: 1px solid #CCCCCC;
+	padding: 0.1em;
+}
+.loading {
+	padding: 0 2em 0 1em;
+	font-style: italic;
+	font-weight: bold;
+	background-image: url("loading.gif");
+	background-repeat: no-repeat;
+	background-position: right;
+	background-size: 1.2em 1.2em;
+}

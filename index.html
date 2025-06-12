@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+	<title>WebELAN</title>
+	<meta name="description" content="A minimalistic in-browser version of ELAN">
+	<meta name="keywords" content="linguistics, language documentation, transcription, ELAN, annotation">
+	<meta name="author" content="dr²">
+	<link rel="shortcut icon" 	 href="../favicon.ico" />
+	<link rel="apple-touch-icon" href="../site_icon.png" />
+	<link rel="icon"             href="../site_icon.png" />
+	<meta name="viewport" content="width=device-width">
+
+	<link rel="stylesheet" type="text/css" href="WebELAN_v001.css">
+	
+</head>
+<body>
+	
+	<div id="user-input">
+		<div>
+			<h3>Drag & Drop .eaf or Click to Upload</h3>
+		</div>
+	</div>
+	
+	<div id="elan">
+		<div id="audio-block">
+			<div id="audio-input">
+				<div>
+					<h3>Drag & Drop Audio file or Click to Upload</h3>
+				</div>
+			</div>
+			<div id="load-audio-container">
+				<div id="load-audio-filename"></div>
+				<button id="load-audio-button">Load</button>
+			</div>
+			<div id="audio-display">
+				<canvas id="spectrogram"></canvas>
+				<svg preserveAspectRatio="none" id="waveform" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+				  <polygon id="waveform_fill"></polygon>
+				</svg>
+			</div>
+		</div>
+		<div id="tier-block">
+		</div>
+	</div>
+	
+
+	<script src="WebELAN_v001.js" type="text/javascript" charset="utf-8"></script>
+	<script src="WebELANViz_v001.js" type="text/javascript" charset="utf-8"></script>
+
+	<script src="setup-we_v001.js" type="text/javascript" charset="utf-8"></script>
+
+</body>
+</html>
