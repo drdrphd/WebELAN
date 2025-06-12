@@ -1,6 +1,7 @@
 /*!
  * WebELAN
  * Version: 0.0.1
+ * Author: dr²
  * AI coding assistant: ChatGPT
  * License: fully open, no rights reserved, use at your own risk
  * Description: A library of functions for handling ELAN files within a browser
@@ -32,6 +33,7 @@ function Annotation(elan, annotationXML) {
 	this.end           = this.elan.getTime(this.endTimeID);
 	this.value         = this.annotationXML.children[0].children[0].textContent;
 	this.alignable     = ("ALIGNABLE_ANNOTATION" == this.annotationXML.children[0].tagName); //boolean
+	this.refAnnotation = (this.annotationXML.children[0].getAttribute("ANNOTATION_REF") || null);
 }
 
 
@@ -41,6 +43,7 @@ function Tier(elan, tierXML) {
 	this.ID            = this.elan.getID(this.tierXML);
 	this.name          = this.ID;
 	this.annotations   = this.elan.annotations(this.tierXML);
+	this.parentTier    = this.tierXML.getAttribute("PARENT_REF");
 }
 
 
@@ -189,12 +192,18 @@ WebELAN.prototype.getMaxTime = function() {
 	times = this.times();
 	max_time = 0;
 	for (var i = 0; i < times.length; i++) {
-		if (max_time < times[i].getAttribute("TIME_VALUE")) {
-			max_time = times[i].getAttribute("TIME_VALUE");
+		if (+max_time < +times[i].getAttribute("TIME_VALUE")) {	// use + to cast text values as numeric
+			 max_time = +times[i].getAttribute("TIME_VALUE");
 		}
 	}
 	return max_time;
 }
+
+
+
+/***************************************/
+/* Functions for properties of objects */
+/***************************************/
 
 
 //
@@ -266,25 +275,100 @@ WebELAN.prototype.getAnnotationByID = function(ref) {
 		}
 	}
 }
+
+
+//
+// (Annotation).getSiblings()
+//
+// Returns an array of Annotation objects with the same parent as the current Annotation
+//
+Annotation.prototype.getSiblings = function() {
+	const annotations = WebELAN.annotations();
+	var siblings = [];
+	
+	for (var i = 0; i < annotations.length; i++) {
+		if (this.refAnnotation == annotations[i].refAnnotation) {
+			siblings.push(annotations[i]);
+		}
+	}
+	return siblings;
+}
 	
 
 //
-// getChildTiers(XML, XML)
+// getChildTiers(Tier)
 //
-// Takes an ELAN object (XML) and a tier (XML)
-// Returns an array of tiers [XML, XML, ...]
+// Takes a Tier object
+// Returns an array of Tier objects
 //
 WebELAN.prototype.getChildTiers = function(tier) {
-	const tiers = this.elan_file.getElementsByTagName("TIER");
+	const tiers = this.tiers();
 	var child_tiers = [];
 	
 	for (var i = 0; i < tiers.length; i++) {
-		if (tiers[i].getAttribute("PARENT_REF") == tier.getAttribute("TIER_ID")) {
+		if (tiers[i].parentTier == tier.ID) { //get the tier if it has this one as its parent
 			child_tiers.push(tiers[i]);
 		}
 	}
 	return child_tiers;
 }
+
+
+
+/***********************************/
+/* Functions for modifying content */
+/***********************************/
+
+//
+// sortTiersHierarchical([Tier])
+//
+// Takes an array of Tier objects
+// First separates into parents and non-parents
+// (Puts all parents into the sorted_array)
+// Then while there are children,
+// goes through and inserts after its parent in the sorted array
+//
+// Returns an array of Tier objects
+//
+WebELAN.prototype.sortTiersHierarchical = function(tiers) {
+	var sorted_array = [];
+	var children = [];
+	
+	//separate off the top nodes
+	for (var i = 0; i < tiers.length; i++) {
+		if (tiers[i].parentTier === null) {
+			sorted_array.push(tiers[i]);
+		} else {
+			children.push(tiers[i]);
+		}
+	}
+	
+	function getParentIndex(ID) {
+		for (var i = 0; i < sorted_array.length; i++) {
+			if (sorted_array[i].ID == ID) return i;
+		}
+		return null;
+	}
+	
+	while (children.length > 0) {	//keep doing this while there are children
+		var temp_tier = children.pop();	//take the last element
+		var i = getParentIndex(temp_tier.parentTier); //get the index of the parent tier in sorted_array (returns null if not in list)
+		if (i !== null) {
+			sorted_array.splice(i+1, 0, temp_tier); //insert after its parent
+		} else {
+			children.unshift(temp_tier);  //or, if no parent in the list, put it back at the beginning of children and try again
+		}
+	}
+	return sorted_array;
+}
+
+
+
+
+
+/*********************/
+/* General Utilities */
+/*********************/
 
 //
 // msToMinSec(int)
