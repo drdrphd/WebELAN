@@ -173,28 +173,10 @@ window.onload = function(){
 	function onLoadEAF() {
 		document.getElementById("user-input").style.display = "none";
 		document.getElementById("elan").style.display = "block";
+		
+		
 	}
 
-		
-	
-	
-	
-	function updateTiers(e) {
-		//maybe do this by checkbox instead?
-		
-		const tier_selection = e.target.value;
-		if (tier_selection == "unselected") {
-			return;
-		} else {
-			const tiers = elan.tiers();
-			var selected_tier = tiers[+tier_selection];
-			var selected_tiers = [selected_tier];
-			var child_tiers = elan.getChildTiers(selected_tier);
-			
-			selected_tiers = selected_tiers.concat(child_tiers);
-			displayTierText(selected_tiers);
-		}
-	}
 	
 	function displayTierText(tiers) {
 

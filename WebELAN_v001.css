@@ -11,9 +11,6 @@ body {
 	font-family: sans-serif;
 	box-sizing: border-box;
 }
-div {
-	padding: 2em;
-}
 input, button {
 	font-size: 1em;
 	margin-right: 0.25em;
@@ -135,6 +132,34 @@ label {
 	height: 60%;
 	width: 100%;
 	overflow: scroll;
+}
+.tier {
+	display: flex;
+	margin: 0;
+	padding: 0;
+	height: 4em;
+	width: 100%;
+	align-items: center;
+}
+.tier-label {
+	display: flex;
+	position: absolute;
+	padding: auto 1em;
+	left: 0;
+	width: 6em;
+	height: inherit;
+	text-align: right;
+	width: 6em;
+	height: inherit;
+	text-align: right;
+	align-items: center;
+	background-color: white;
+}
+.tier-content {
+	display: block;
+	margin-left: 7em;
+	width: 100%;
+	height: inherit;
 }
 
 

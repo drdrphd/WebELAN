@@ -2,7 +2,7 @@
  * WebELANViz
  * Version: 0.0.1
  * Author: dr²
- * AI Code assistant: ChatGPT
+ * AI coding assistant : ChatGPT
  * License: fully open, no rights reserved, use at your own risk
  * Description: A library of functions for viewing ELAN files and working with Audio in browser
  * 				ELAN is a time-aligned transcription platform for linguistic transcription
@@ -32,7 +32,7 @@ function WebELANViz() {
 // initializeAudioContext()
 //
 // A user gesture is required to create an AudioContext
-// Can be called from drag-and-drop, file open, buttons, etc.
+// Cannot be called from drag-and-drop; Must be from a direct button press, click, key input, etc.
 //
 WebELANViz.prototype.initializeAudioContext = function() {
   if (this.audioContext === undefined) {
@@ -55,6 +55,9 @@ WebELANViz.prototype.loadAudio = function(file) {
 			self.audioContext.decodeAudioData(arrayBuffer, function(buffer) {
 				self.audio = self.audioContext.createBufferSource();
 				self.audio.buffer = buffer;
+				self.audio.connect(self.audioContext.destination);
+				self.audio.start(0);
+				
 				resolve();
 			});
 		};
