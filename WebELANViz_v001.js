@@ -27,6 +27,18 @@ WebELANViz.prototype.changeZoom = function(zoom) {
 	var r = document.querySelector(':root');
 	r.style.setProperty('--hzoom', zoom);
 }
+WebELANViz.prototype.zoomIn = function() {
+	var r = document.querySelector(':root');
+	var zoom = getComputedStyle(r).getPropertyValue('--hzoom');
+	zoom = zoom*1.15;
+	r.style.setProperty('--hzoom', zoom);
+}
+WebELANViz.prototype.zoomOut = function() {
+	var r = document.querySelector(':root');
+	var zoom = getComputedStyle(r).getPropertyValue('--hzoom');
+	zoom = zoom/1.15;
+	r.style.setProperty('--hzoom', zoom);
+}
 	
 
 

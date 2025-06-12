@@ -44,6 +44,34 @@ input {
 	cursor: pointer;
 }
 
+#ribbon {
+	position: fixed;
+	top: 0;
+	width: 100%;
+	height: 1.5rem;
+	background: #eee;
+	border-bottom: 1px solid gray;
+}
+#ribbon div {
+	display: inline-block;
+	height: inherit;
+	width: fit-content;
+	margin: 0;
+	margin-left: 1em;
+	padding: 0 0.5em;
+	background: #bbb;
+	color: white;
+	font-weight: bold;
+	border-bottom: 1px solid gray;
+	cursor: pointer;
+}
+#ribbon a {
+	display: inline-block;
+	margin: 0;
+	padding: 0;
+	height: inherit;
+}
+
 #elan {
 	display: none;
 	margin: 0;
@@ -55,7 +83,7 @@ input {
 #audio-block {
 	display: flex;
 	margin: 0;
-	padding: 0;
+	padding: 1.5em 0 0 0;
 	height: 20%;
 	width: 100%;
 	overflow: hidden;

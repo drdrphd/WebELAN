@@ -15,16 +15,33 @@ var elan_viz = new WebELANViz();
 
 
 function saveEAF(){	//testing how to export / add new blocks to the ELAN file
+
+	//**** All this top stuff should be moved to an update function that is called anytime an input is updated ****
+	var annotation_inputs = document.getElementsByClassName("annotation");
+	var elanXML_annotations = elan.elan_file.getElementsByTagName("ANNOTATION");
+	for (var i = 0; i < annotation_inputs.length; i++) {
+		for (var j = 0; j < elanXML_annotations.length; j++) {
+			if (annotation_inputs[i].id == elanXML_annotations[j].children[0].getAttribute("ANNOTATION_ID")) {
+				// //elan file ANNOTATIONs . (REF_ANNOTATION || ALIGNABLE_ANNOTATION) . ANNOTATION_VALUE . text:___ . text value
+				elan.elan_file.getElementsByTagName("ANNOTATION")[j].children[0].children[0].childNodes[0].nodeValue = annotation_inputs[i].value;
+			}
+		}
+	}
+	
 	elan.exportEAF();
+}
+function zoomIn(){
+	elan_viz.zoomIn();
+}
+function zoomOut(){
+	elan_viz.zoomOut();
 }
 
 
 window.onload = function(){
 	
 	//document elements
-	const tier_preview = document.querySelector("#tier-preview");
-	const tier_input = document.querySelector("#tier-input");
-	const tier_output = document.querySelector("#tier-output");
+
 
 	dragAndDropEAF();
 	dragAndDropAudio();
@@ -215,6 +232,7 @@ window.onload = function(){
 			for (var j = 0; j < annotations.length; j++) {
 				const new_annotation = document.createElement("input");
 				new_annotation.type = "text";
+				new_annotation.id = annotations[j].id;
 				new_annotation.value = annotations[j].value;
 				new_annotation.classList.add("annotation");
 				
