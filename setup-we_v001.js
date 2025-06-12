@@ -22,7 +22,8 @@ function saveEAF(){	//testing how to export / add new blocks to the ELAN file
 	for (var i = 0; i < annotation_inputs.length; i++) {
 		for (var j = 0; j < elanXML_annotations.length; j++) {
 			if (annotation_inputs[i].id == elanXML_annotations[j].children[0].getAttribute("ANNOTATION_ID")) {
-				// //elan file ANNOTATIONs . (REF_ANNOTATION || ALIGNABLE_ANNOTATION) . ANNOTATION_VALUE . text:___ . text value
+				// Key to the followng line:
+				// elan Object. XML. elan file <ANNOTATION>s. (<REF_ANNOTATION> || <ALIGNABLE_ANNOTATION>). <ANNOTATION_VALUE>. text:___. text value
 				elan.elan_file.getElementsByTagName("ANNOTATION")[j].children[0].children[0].childNodes[0].nodeValue = annotation_inputs[i].value;
 			}
 		}
@@ -205,7 +206,7 @@ window.onload = function(){
 	//
 	function setupTiers(tiers) {
 		
-		var scaling = 100;	//absolute position by milliseconds is too wide; scale down
+		var scaling = 10;	//absolute position by milliseconds is too wide; scale down
 		
 		tiers = elan.sortTiersHierarchical(tiers);
 		document.getElementById("tiers").style.width = "calc( var(--hzoom) * " + (+elan.getMaxTime() + 100)/scaling + "px)";	//set up the overall width of the tier container / background
@@ -230,18 +231,16 @@ window.onload = function(){
 			
 			//add the annotations
 			for (var j = 0; j < annotations.length; j++) {
-				const new_annotation = document.createElement("input");
-				new_annotation.type = "text";
-				new_annotation.id = annotations[j].id;
-				new_annotation.value = annotations[j].value;
-				new_annotation.classList.add("annotation");
+				const new_annotation_input = document.createElement("input");
+				new_annotation_input.type = "text";
+				new_annotation_input.id = annotations[j].id;
+				new_annotation_input.value = annotations[j].value;
+				new_annotation_input.classList.add("annotation");
 				
-				//************** check for siblings here ****************************
+				new_annotation_input.style.left = "calc( var(--hzoom) * " + annotations[j].start/scaling + "px)";
+				new_annotation_input.style.width = "calc( var(--hzoom) * " + (annotations[j].end - annotations[j].start)/scaling + "px)";
 				
-				new_annotation.style.left = "calc( var(--hzoom) * " + annotations[j].start/scaling + "px)";
-				new_annotation.style.width = "calc( var(--hzoom) * " + (annotations[j].end - annotations[j].start)/scaling + "px)";
-				
-				new_tier_content.appendChild(new_annotation);
+				new_tier_content.appendChild(new_annotation_input);
 			}
 			
 			new_tier.appendChild(new_tier_content);

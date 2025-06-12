@@ -27,13 +27,13 @@ function Annotation(elan, annotationXML) {
 	this.annotationXML = annotationXML;
 	this.id            = this.elan.getId(this.annotationXML.children[0]);
 	this.name          = this.id;
-	this.startTimeId   = this.elan.getStartTimeId(this);
-	this.endTimeId     = this.elan.getEndTimeId(this);
-	this.start         = this.elan.getTime(this.startTimeId);
-	this.end           = this.elan.getTime(this.endTimeId);
-	this.value         = this.annotationXML.children[0].children[0].textContent;
 	this.alignable     = ("ALIGNABLE_ANNOTATION" == this.annotationXML.children[0].tagName); //boolean
-	this.refAnnotation = (this.annotationXML.children[0].getAttribute("ANNOTATION_REF") || null);
+	this.refAnnotation = (this.annotationXML.children[0].getAttribute("ANNOTATION_REF") || null); //parent Annotation
+	this.siblings      = this.elan.getSiblingRefs(this); //[] of ref strings
+	this.times         = this.elan.getTimes(this);
+	this.start         = this.times[0];
+	this.end           = this.times[1];
+	this.value         = this.annotationXML.children[0].children[0].textContent;
 }
 
 
@@ -111,7 +111,7 @@ WebELAN.prototype.exportEAF = function(filename) {
 //
 // times()
 //
-// Returns an XML object of times {XML, XML, ...}
+// Returns an XML object of TIME_SLOT elements {XML, XML, ...}
 //
 WebELAN.prototype.times = function() {
 	return this.elan_file.getElementsByTagName("TIME_SLOT"); //if none, then null
@@ -171,13 +171,13 @@ WebELAN.prototype.getId = function(item) {
 // getTime(string)
 //
 // Takes a TIME_SLOT_ID (string)
-// Returns a time (string) in miliseconds
+// Returns a time (numeric) in miliseconds
 //
 WebELAN.prototype.getTime = function(time) {
 	times = this.times();
 	for (var i = 0; i < times.length; i++) {
 		if (time == times[i].getAttribute("TIME_SLOT_ID")) {
-			return times[i].getAttribute("TIME_VALUE");
+			return +times[i].getAttribute("TIME_VALUE");
 		}
 	}
 }
@@ -187,14 +187,14 @@ WebELAN.prototype.getTime = function(time) {
 // getMaxTime()
 //
 // Finds the maximum time among all TIME_SLOT elements
-// Returns a time (string) in miliseconds
+// Returns a time (numeric) in miliseconds
 //
 WebELAN.prototype.getMaxTime = function() {
 	times = this.times();
 	max_time = 0;
 	for (var i = 0; i < times.length; i++) {
-		if (+max_time < +times[i].getAttribute("TIME_VALUE")) {	// use + to cast text values as numeric
-			 max_time = +times[i].getAttribute("TIME_VALUE");
+		if (max_time < +times[i].getAttribute("TIME_VALUE")) {	// use + to cast text values as numeric
+			max_time = +times[i].getAttribute("TIME_VALUE");
 		}
 	}
 	return max_time;
@@ -208,57 +208,108 @@ WebELAN.prototype.getMaxTime = function() {
 
 
 //
-// getStartTimeId(Annotation)
+// getSiblingRefs(Annotation)
 //
-// Takes an Annotation object
-// Return annotation start time ID (TIME_SLOT_REF1) as a String
+// Returns an array of references ot annotations [string,...]
+// that have the same parent that the current Annotation has
+// (includes self)
 //
-WebELAN.prototype.getStartTimeId = function(annotation) {
-	var time = "";
+WebELAN.prototype.getSiblingRefs = function(annotation) {
+	//use XML file to prevent a recursive call
+	const annotationElements = this.elan_file.getElementsByTagName("ANNOTATION");
+	var siblings = [];
 	
-	//if it's an alignable transcription, just get the time
-	var alignables = annotation.annotationXML.getElementsByTagName("ALIGNABLE_ANNOTATION");
-	if (alignables.length > 0) {
-		time = alignables[0].getAttribute("TIME_SLOT_REF1");
-		return time;
+	for (var i = 0; i < annotationElements.length; i++) {
+		if (annotation.refAnnotation !== null	//don't get elements without a parent
+		    && annotation.refAnnotation == 
+				annotationElements[i].children[0].getAttribute("ANNOTATION_REF")) {
+			siblings.push(annotationElements[i].children[0].getAttribute("ANNOTATION_ID"));
+		}
 	}
+	return siblings;
+}
 	
-	//otherwise, get the parent annotation's time (or its parent, or ...)
-	var refs = annotation.annotationXML.getElementsByTagName("REF_ANNOTATION");
-	if (refs.length > 0) {
-		var id = refs[0].getAttribute("ANNOTATION_REF");
-		var annotation = this.getAnnotationById(id);
-		time = this.getStartTimeId(annotation);	//recursive call (might be a few layers deep)
-		return time;
+
+//
+// getChildTiers(Tier)
+//
+// Returns an array of Tier objects having the current Tier as a parent
+//
+WebELAN.prototype.getChildTiers = function(tier) {
+	const tiers = this.tiers();
+	var child_tiers = [];
+	
+	for (var i = 0; i < tiers.length; i++) {
+		if (tiers[i].parentTier == tier.id) { //get the tier if it has this one as its parent
+			child_tiers.push(tiers[i]);
+		}
 	}
+	return child_tiers;
 }
 
 
 //
-// getEndTimeId(Annotation)
+// getTimes(Annotation)
 //
 // Takes an Annotation object
-// Returns Annotation end time ID (TIME_SLOT_REF2) as a String
+// Return an array of Start time and End time, [num, num]
 //
-WebELAN.prototype.getEndTimeId = function(annotation) {
+WebELAN.prototype.getTimes = function(annotation) {
 	var time = "";
 	
-	//if it's an alignable transcription, just get the time
-	var alignables = annotation.annotationXML.getElementsByTagName("ALIGNABLE_ANNOTATION");
-	if (alignables.length > 0) {
-		time = alignables[0].getAttribute("TIME_SLOT_REF2");
-		return time;
+	//for alignable annotations, return times
+	if (annotation.alignable) {
+		var start_time_ref = annotation.annotationXML.children[0].getAttribute("TIME_SLOT_REF1");
+		var end_time_ref = annotation.annotationXML.children[0].getAttribute("TIME_SLOT_REF2");
+		
+		return [this.getTime(start_time_ref), this.getTime(end_time_ref)];
 	}
 	
-	//otherwise, get the parent annotation's time (or its parent, or ...)
-	var refs = annotation.annotationXML.getElementsByTagName("REF_ANNOTATION");
-	if (refs.length > 0) {
-		var id = refs[0].getAttribute("ANNOTATION_REF");
-		var annotation = this.getAnnotationById(id);
-		time = this.getEndTimeId(annotation);	//recursive call (might be a few layers deep)
-		return time;
+	//for reference annotations...
+	//get the times of the parent and the number of siblings
+	//divide the parent time by siblings...
+	//figure out the order of the siblings...
+	//and assign a sub-time to this annotation
+	// *** possible future re-write if there's an easier way ***
+	//
+	var parent_times = this.getTimes(	//recursive call for the...
+		this.getAnnotationById( annotation.refAnnotation ));  //..parent annotation
+		
+	if (annotation.siblings.length == 1) {  //(includes self)
+		return parent_times;
+	} else {
+		var sub_duration = (parent_times[1] - parent_times[0]) / annotation.siblings.length;
+		var ordered_siblings = [];
+		//look for siblings without 
+		for (var i = 0; i < annotation.siblings.length; i++) {
+			if ( this.getAnnotationXMLById(annotation.siblings[i]) //retrieve referenced sibling
+					.children[0].getAttribute("PREVIOUS_ANNOTATION") //check for sub-tag with "PREVIOUS_ANNOTATION"
+					   === null ) {  //null if is at left
+				ordered_siblings.push(annotation.siblings[i]);
+			}
+		}
+		//then add siblings who are to the right of the prior annotation
+		//we have to go through the list once for each element we add
+		for (var i = 0; i < annotation.siblings.length; i++) {
+			for (var j = 0; j < ordered_siblings.length; j++) {
+				if ( this.getAnnotationXMLById(annotation.siblings[i]) //retrieve referenced sibling
+						.children[0].getAttribute("PREVIOUS_ANNOTATION") //check for sub-tag with "PREVIOUS_ANNOTATION"
+							== ordered_siblings[ordered_siblings.length - 1] ) { //check against last item
+					ordered_siblings.push(annotation.siblings[i]);
+				}
+			}
+		}
+		var ord = 0;
+		for (var i = 0; i < ordered_siblings.length; i++) {
+			if (ordered_siblings[i] == annotation.id) ord = i;
+		}
+		var start_time = parent_times[0] + Math.floor(ord * sub_duration);
+		var end_time = parent_times[0] + Math.floor((ord + 1) * sub_duration);
+		
+		return [start_time, end_time];
 	}
 }
+
 
 
 //
@@ -277,42 +328,24 @@ WebELAN.prototype.getAnnotationById = function(ref) {
 	}
 }
 
-
 //
-// (Annotation).getSiblings()
+// getAnnotationXMLById(string)
 //
-// Returns an array of Annotation objects with the same parent as the current Annotation
+// Takes a reference to another annotation (string)
+// Return a reference (string) to another annotation
+// (does not return Annotation to prevent recursion overflows)
 //
-Annotation.prototype.getSiblings = function() {
-	const annotations = WebELAN.annotations();
-	var siblings = [];
-	
-	for (var i = 0; i < annotations.length; i++) {
-		if (this.refAnnotation == annotations[i].refAnnotation) {
-			siblings.push(annotations[i]);
+WebELAN.prototype.getAnnotationXMLById = function(ref) {
+	annotationElements = this.elan_file.getElementsByTagName("ANNOTATION");	//if none, then null
+	for (var i = 0; i < annotationElements.length; i++) {
+		if (ref == annotationElements[i].children[0].getAttribute("ANNOTATION_ID")) {
+			return annotationElements[i];
 		}
 	}
-	return siblings;
 }
-	
 
-//
-// getChildTiers(Tier)
-//
-// Takes a Tier object
-// Returns an array of Tier objects
-//
-WebELAN.prototype.getChildTiers = function(tier) {
-	const tiers = this.tiers();
-	var child_tiers = [];
-	
-	for (var i = 0; i < tiers.length; i++) {
-		if (tiers[i].parentTier == tier.id) { //get the tier if it has this one as its parent
-			child_tiers.push(tiers[i]);
-		}
-	}
-	return child_tiers;
-}
+
+
 
 
 
