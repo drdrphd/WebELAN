@@ -411,7 +411,7 @@ WebELAN.prototype.sortTiersHierarchical = function(tiers) {
 // taken from: https://stackoverflow.com/questions/21294302/converting-milliseconds-to-minutes-and-seconds-with-javascript
 //
 function msToMinSec(ms) {
-		var minutes = Math.floor(ms / 60000);
-		var seconds = ((ms % 60000) / 1000).toFixed(0);
-		return (seconds == 60 ? (minutes+1) + ":00" : minutes + ":" + (seconds < 10 ? "0" : "") + seconds);
-	}
+	var minutes = Math.floor(ms / 60000);
+	var seconds = ((ms % 60000) / 1000).toFixed(0);
+	return (seconds == 60 ? (minutes+1) + ":00" : minutes + ":" + (seconds < 10 ? "0" : "") + seconds);
+}

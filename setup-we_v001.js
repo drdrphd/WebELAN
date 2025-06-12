@@ -32,10 +32,16 @@ function saveEAF(){	//testing how to export / add new blocks to the ELAN file
 	elan.exportEAF();
 }
 function zoomIn(){
-	elan_viz.zoomIn();
+	var current_width = getComputedStyle(document.getElementById("tiers")).width;  //string with "...px"
+	current_width = current_width.substring(0, current_width.length - 2);  //take off "...px"
+	document.getElementById("tier-content").scrollLeft = (document.getElementById("tier-content").scrollLeft / current_width) * current_width * 1.15;
+	elan_viz.zoomIn(1.15);
 }
 function zoomOut(){
-	elan_viz.zoomOut();
+	var current_width = getComputedStyle(document.getElementById("tiers")).width;
+	current_width = current_width.substring(0,current_width.length - 2);  //take off "...px"
+	document.getElementById("tier-content").scrollLeft = (document.getElementById("tier-content").scrollLeft / current_width) * current_width / 1.15;
+	elan_viz.zoomOut(1.15);
 }
 
 
