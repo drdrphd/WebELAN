@@ -2,7 +2,7 @@
  * WebELAN
  * Version: 0.0.1
  * Author: dr²
-* AI Code assistant: ChatGPT
+ * AI Code assistant: ChatGPT
  * License: fully open, no rights reserved, use at your own risk
  * Description: A library of functions for handling ELAN files within a browser
  * 				ELAN is a time-aligned transcription platform for linguistic transcription
