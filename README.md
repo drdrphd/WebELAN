@@ -7,7 +7,13 @@ ELAN is a time-aligned transcription platform for linguistic transcription. Much
 
 WebELAN is unrelated to & independent from their efforts.
 
-# Development To-do
+# Used in...
+Used in other projects:
+
+- Transcripter
+- Excerpter
+
+# Development To-do List
 The initial intent was to interface with a real-time database platform (like Firebase) to create a multi-user editor for ELAN files (XML-based time-aligned tiered transcript files).
 
 Still working on local viewing and manipulation.
