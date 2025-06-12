@@ -174,48 +174,51 @@ window.onload = function(){
 		document.getElementById("user-input").style.display = "none";
 		document.getElementById("elan").style.display = "block";
 		
+		//choose palette?
 		
+		//load material from tiers into window
+		setupTiers(elan.tiers());
 	}
 
 	
-	function displayTierText(tiers) {
-
-		var transcriptions = [];
-		var times = elan.times();
+	//
+	// setupTiers(XML)
+	//
+	// Takes the information from the elan file and creates the tiers, tier names, and content blocks
+	//
+	function setupTiers(tiers) {
+		
+		var scaling = 100;
+		document.getElementById("tiers").style.width = "calc( var(--hzoom) * " + (+elan.getMaxTime() + 100)/scaling + "px";
 		
 		for (var i = 0; i < tiers.length; i++) {
-			transcriptions.push(tiers[i].getElementsByTagName("ANNOTATION"));
-		}
-		
-		document.getElementById("text").innerHTML = ""; //reset
-		
-		for (var i = 0; i < transcriptions.length; i++) {
-			var annotations = transcriptions[i];
+			const annotations = tiers[i].annotations;
 			
-			for (var j = 0; j < annotations.length; j++){
-				var start_time = elan.getAnnotationStartTime(annotations[j]);
+			const new_tier_label = document.createElement("div");
+			new_tier_label.classList.add("tier-label");
+			new_tier_label.innerHTML = tiers[i].name + " [" + annotations.length + "]";
+			document.getElementById("tier-labels").appendChild(new_tier_label);
+
+			const new_tier = document.createElement("div");
+			new_tier.classList.add("tier");
+
+			const new_tier_content = document.createElement("div");
+			new_tier_content.classList.add("tier-content");
+			
+			for (var j = 0; j < annotations.length; j++) {
+				const new_annotation = document.createElement("input");
+				new_annotation.type = "text";
+				new_annotation.value = annotations[j].value;
+				new_annotation.classList.add("annotation");
+				new_annotation.style.left = "calc( var(--hzoom) * " + annotations[j].start/scaling + "px";
+				new_annotation.style.width = "calc( var(--hzoom) * " + (annotations[j].end - annotations[j].start)/scaling + "px";
 				
-				var show_times = false;
-				for (var k = 0; k < times.length; k++){
-					if (start_time == times[k].getAttribute("TIME_SLOT_ID")) {
-						start_time = msToMinSec(times[k].getAttribute("TIME_VALUE"));
-						show_times = true;
-					}
-				}
-				if (show_times) {
-					document.getElementById("text").innerHTML += 
-						("<small>" + start_time + "&emsp;</small>");
-				}
-				document.getElementById("text").innerHTML += 
-					(annotations[j].getElementsByTagName("ANNOTATION_VALUE")[0].innerHTML + "</br>");
+				new_tier_content.appendChild(new_annotation);
 			}
+			
+			new_tier.appendChild(new_tier_content);
+			document.getElementById("tiers").appendChild(new_tier);
 		}
-	}
-	
-	
-	// Returns a Promise that resolves after "ms" Milliseconds
-	function timer(ms) {
-		return new Promise(res => setTimeout(res, ms));
 	}
 }
 

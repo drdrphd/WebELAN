@@ -2,7 +2,7 @@
  * WebELANViz
  * Version: 0.0.1
  * Author: dr²
- * AI coding assistant : ChatGPT
+ * AI coding assistant: ChatGPT
  * License: fully open, no rights reserved, use at your own risk
  * Description: A library of functions for viewing ELAN files and working with Audio in browser
  * 				ELAN is a time-aligned transcription platform for linguistic transcription
@@ -21,6 +21,13 @@ function WebELANViz() {
 	//store reference to div?
 };
 
+
+// Change Zoom (move later)
+WebELANViz.prototype.changeZoom = function(zoom) {
+	var r = document.querySelector(':root');
+	r.style.setProperty('--hzoom', zoom);
+}
+	
 
 
 /*******************/
